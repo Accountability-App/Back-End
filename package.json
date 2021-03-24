@@ -1,7 +1,7 @@
 {
-  "name": "accountabilityappbackend",
+  "name": "connectpackage",
   "version": "1.0.0",
-  "description": "",
+  "description": "to run this locally, run these commands\r - npm i\r - npm start",
   "main": "index.js",
   "scripts": {
     "start": "nodemon src/index.ts",
@@ -19,7 +19,8 @@
   },
   "homepage": "https://github.com/Accountability-App/Back-End#readme",
   "dependencies": {
-    "express": "^4.17.1"
+    "express": "^4.17.1",
+    "firebase": "^8.3.1"
   },
   "devDependencies": {
     "@types/express": "^4.17.11",
