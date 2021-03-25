@@ -9,12 +9,17 @@ import * as AccountModels from '../models/userAccount.model';
  */
 export async function getFriendsList(db: firebase.default.database.Database, user: string) : Promise<void> {
     console.log(user);
-    let friendsList = await db.ref(`/Users/${user}`).child('friends').get();
-    console.log(friendsList.val());
+    let friendsList = await db.ref(`/Users/${user}`).get();
+    console.log(friendsList.val())
+    console.log(typeof friendsList.val())
+    console.log(friendsList.val()['friends']);
     let friendsData: AccountModels.UserBuddies[]
-    /*friendsList.forEach(element => {
-        let newFriendData = db.ref(`/Users`).child('userID').equalTo(element).get();
-    });*/
+    Object.keys(friendsList.val()['friends']).forEach(async (element: any) => {
+        console.log(element)
+        console.log(friendsList.val()['friends'][element])
+        let newFriendData = await db.ref(`/Users/${friendsList.val()['friends'][element]}`).get();
+        console.log(newFriendData.val())
+    });
 }
 
 /*
