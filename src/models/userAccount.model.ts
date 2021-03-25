@@ -28,9 +28,9 @@ export interface UserProfileSearch {
     friendStatus: number
 }
 
-export interface FriendRequestStatus {
+/*export interface FriendRequestStatus {
     "0" : string = "notFriends,
     "ISentRequest" : string,
     "TheySentRequest" : string,
     "Friends" : string,
-}
+}*/

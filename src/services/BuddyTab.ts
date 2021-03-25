@@ -1,4 +1,5 @@
-import * as AccountModels from '../models/userAccount.model';
+import { UserBuddies } from '../models/userAccount.model';
+
 
 //figure out how to store friend requests and user
 
@@ -7,19 +8,26 @@ import * as AccountModels from '../models/userAccount.model';
  * During: authenticate they're the logged in user
  * Return: a list of friends (first, last, username)
  */
-export async function getFriendsList(db: firebase.default.database.Database, user: string) : Promise<void> {
-    console.log(user);
+export async function getFriendsList(db: firebase.default.database.Database, user: string) : Promise<UserBuddies[]> {
+    //console.log(user);
     let friendsList = await db.ref(`/Users/${user}`).get();
-    console.log(friendsList.val())
-    console.log(typeof friendsList.val())
-    console.log(friendsList.val()['friends']);
-    let friendsData: AccountModels.UserBuddies[]
-    Object.keys(friendsList.val()['friends']).forEach(async (element: any) => {
-        console.log(element)
-        console.log(friendsList.val()['friends'][element])
-        let newFriendData = await db.ref(`/Users/${friendsList.val()['friends'][element]}`).get();
-        console.log(newFriendData.val())
-    });
+    //console.log(friendsList.val())
+    //console.log(typeof friendsList.val())
+    //console.log(friendsList.val()['friends']);
+    let friendsData: Array<UserBuddies> = new Array<UserBuddies>();
+    for(const element in friendsList.val()['friends']) {
+        let friendUser = friendsList.val()['friends'][element]
+        let newFriendData = await db.ref(`/Users/${friendUser}`).get();
+        let newFriendUser: UserBuddies = {
+            username: friendUser,
+            givenName: newFriendData.val()['firstname'],
+            familyName: newFriendData.val()['lastname']
+        }
+        friendsData.push(newFriendUser)
+        console.log(friendsData)
+    }
+    console.log(friendsData)
+    return friendsData
 }
 
 /*

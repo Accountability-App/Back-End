@@ -17,8 +17,9 @@ var database = firebase.database();
 const server = express();
 const PORT = 8082;
 server.get('/', (req, res) => res.send('Express and Typescript Server'));
-server.get('/BuddyTab/getFriends/:username', (req, res) => {
-	buddyService.getFriendsList(database, req.params.username);
+server.get('/BuddyTab/getFriends/:username', async (req, res) => {
+	const buddyList = await buddyService.getFriendsList(database, req.params.username);
+	res.send(buddyList)
 })
 server.listen(PORT, () => {
     console.log(`[server]: Server is running at http://localhost:${PORT}`)
