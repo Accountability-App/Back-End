@@ -8,6 +8,7 @@ firebase.initializeApp({
 	projectId: "accountability-app-29b4b",
 	appId: "",
 });
+
 var database = firebase.database();
 /*database.ref('Users/').get().then(function(name){
 	if(name.exists()){
@@ -16,6 +17,11 @@ var database = firebase.database();
 });*/
 const server = express();
 const PORT = 8082;
+server.use(function(req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+    next();
+});
 server.get('/', (req, res) => res.send('Express and Typescript Server'));
 server.get('/BuddyTab/getFriends/:username', async (req, res) => {
 	const buddyList = await buddyService.getFriendsList(database, req.params.username);
