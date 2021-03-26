@@ -17,12 +17,18 @@ var database = firebase.database();
 });*/
 const server = express();
 const PORT = 8082;
+server.use(function(req, res, next) {
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();
+});
 server.get('/', (req, res) => res.send('Express and Typescript Server'));
 /*server.get('/BuddyTab/getFriends/:username', (req, res) => {
 	buddyService.getFriendsList(database, req.params.username);
 })*/
-server.get('/ProfileTab/:username', (req, res) => {
-	profileService.getUserProf(database, req.params.username);
+server.get('/ProfileTab/:username', async (req, res) => {
+	const userProfile = await profileService.getUserProf(database, req.params.username);
+	res.send(userProfile);
 })
 server.listen(PORT, () => {
     console.log(`[server]: Server is running at http://localhost:${PORT}`)
