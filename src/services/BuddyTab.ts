@@ -36,8 +36,8 @@ export async function getFriendsList(db: firebase.default.database.Database, use
 export async function getIncomingFriends(db: firebase.default.database.Database, username: string): Promise<PendingFriends[]> {
     let pendingFriendsList = await db.ref('/FriendReqs').orderByChild('toUser').equalTo(username).get()
     let pendingData: Array<PendingFriends> = new Array<PendingFriends>();
-    for (const element in pendingFriendsList.val()['fromUser']) {
-        let pendingRequest = pendingFriendsList.val()['fromUser'][element]
+    for (const element in pendingFriendsList.val()) {
+        let pendingRequest = pendingFriendsList.val()[element]['fromUser']
         let pendingFriend = await db.ref(`/Users/${pendingRequest}`).get();
         let newPendingFriend: PendingFriends = {
             username: pendingRequest,
@@ -120,6 +120,8 @@ export async function addFriendRequest(db: firebase.default.database.Database, u
     let areFriends = false
     let existReqs = await db.ref('/FriendReqs').orderByChild('toUser').equalTo(user1).get()
     for (const element in existReqs.val()) {
+        console.log(element)
+        console.log(existReqs.val()[element])
         areFriends = (existReqs.val()[element]['fromUser'].indexOf(user2) >= 0)
         if (areFriends) {
             return `Pending request from ${user2}`
@@ -146,15 +148,21 @@ export async function addFriendRequest(db: firebase.default.database.Database, u
    * During: authenticate first user, if a request exists from the first user to the second, cancel the request
    * Return: HTTP Status indicating success/failure
    */
-export async function cancelFriendRequest(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
+/*export async function cancelFriendRequest(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
     let friendReq = await db.ref(`/FriendReqs/${user1}${user2}`).get()
     if (friendReq.val().length >= 1) {
         db.ref(`/FriendReqs/${user1}${user2}`)
     }
-}
+}*/
 
   /*
    * Given: two users, accept/decline
    * During: authenticate first user, accept or decline friend request to the first user from the second user
    * Return: HTTP Status indicating success/failure
    */
+
+/*
+ * Given: two users
+ * During: unfriends the users
+ * Return: Http Status indicating success/failure
+ */
