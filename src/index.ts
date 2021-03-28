@@ -32,11 +32,11 @@ server.get('/BuddyTab/getIncomingFriends/:username', async(req, res) => {
 	res.send(incomingFriends)
 })
 server.get('/BuddyTab/checkFriendStatus/:user1/:user2', async(req, res) => {
-	const friendStatus = buddyService.getFriendStatus(database, req.params.user1, req.params.user2)
+	const friendStatus = await buddyService.getFriendStatus(database, req.params.user1, req.params.user2)
 	res.send(friendStatus)
 })
 server.get('/BuddyTab/makeFriendRequest/:user1/:user2', async(req, res) => {
-	const newRequest = buddyService.addFriendRequest(database, req.params.user1, req.params.user2)
+	const newRequest = await buddyService.addFriendRequest(database, req.params.user1, req.params.user2)
 	res.send(newRequest)
 })
 server.listen(PORT, () => {

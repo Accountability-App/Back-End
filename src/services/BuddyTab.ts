@@ -58,45 +58,51 @@ export async function getIncomingFriends(db: firebase.default.database.Database,
 export async function getFriendStatus(db: firebase.default.database.Database, user1: string, user2: string) {
     let friendsList = await db.ref(`/Users/${user1}`).get()
     let areFriends
-    areFriends = (friendsList.val()['friends'].indexOf(user2) >= 0)
     let response: UserProfileSearch
-    if (areFriends) {
-        let thatFriend = await db.ref(`/Users/${user2}`).get()
-        response = {
-            username: user2,
-            givenName: thatFriend.val()['firstname'],
-            familyName: thatFriend.val()['lastname'],
-            friendStatus: 1
-        }
-        return response
-    } else {
-        let pendingFriendsList = await db.ref('/FriendReqs').orderByChild('toUser').equalTo(user1).get()
-        for (const element in pendingFriendsList.val()) {
-            areFriends = (friendsList.val()[element]['fromUser'].indexOf(user2) >= 0)
-            if (areFriends) {
-                let thatFriend = await db.ref(`/Users/${user2}`).get()
-                response = {
-                    username: user2,
-                    givenName: thatFriend.val()['firstname'],
-                    familyName: thatFriend.val()['lastname'],
-                    friendStatus: 2
-                }
-                return response
+    for (const element in friendsList.val()['friends']) {
+        if (element === user2) {
+            let thatFriend = await db.ref(`/Users/${user2}`).get()
+            response = {
+                username: user2,
+                givenName: thatFriend.val()['firstname'],
+                familyName: thatFriend.val()['lastname'],
+                friendStatus: 1
             }
+            console.log(response)
+            return response
         }
-        pendingFriendsList = await db.ref('/FriendReqs').orderByChild('fromUser').equalTo(user1).get()
-        for (const element in pendingFriendsList.val()) {
-            areFriends = (friendsList.val()[element]['toUser'].indexOf(user2) >= 0)
-            if (areFriends) {
-                let thatFriend = await db.ref(`/Users/${user2}`).get()
-                response = {
-                    username: user2,
-                    givenName: thatFriend.val()['firstname'],
-                    familyName: thatFriend.val()['lastname'],
-                    friendStatus: 3
-                }
-                return response
+    }
+    let pendingFriendsList = await db.ref('/FriendReqs').orderByChild('toUser').equalTo(user1).get()
+    for (const element in pendingFriendsList.val()) {
+        console.log(pendingFriendsList.val()[element])
+        console.log("case 2")
+        //for (const element2 in pendingFriendsList.val()[element]['fromUser'])
+        areFriends = (pendingFriendsList.val()[element]['fromUser'].indexOf(user2) >= 0)
+        if (areFriends) {
+            let thatFriend = await db.ref(`/Users/${user2}`).get()
+            response = {
+                username: user2,
+                givenName: thatFriend.val()['firstname'],
+                familyName: thatFriend.val()['lastname'],
+                friendStatus: 2
             }
+            return response
+        }
+    }
+    pendingFriendsList = await db.ref('/FriendReqs').orderByChild('fromUser').equalTo(user1).get()
+    for (const element in pendingFriendsList.val()) {
+        console.log(pendingFriendsList.val())
+        console.log("Case 3")
+        areFriends = (pendingFriendsList.val()[element]['toUser'].indexOf(user2) >= 0)
+        if (areFriends) {
+            let thatFriend = await db.ref(`/Users/${user2}`).get()
+            response = {
+                username: user2,
+                givenName: thatFriend.val()['firstname'],
+                familyName: thatFriend.val()['lastname'],
+                friendStatus: 3
+            }
+            return response
         }
     }
     let thatFriend = await db.ref(`/Users/${user2}`).get()
