@@ -202,10 +202,10 @@ export async function cancelFriendRequest(db: firebase.default.database.Database
 * During: authenticate first user, accept or decline friend request to the first user from the second user
 * Return: HTTP Status indicating success/failure
 */
-export async function respondToFriendRequest(db: firebase.default.database.Database, user1: string, user2: string, accDec: string): Promise<string> {
+export async function respondToFriendRequest(db: firebase.default.database.Database, user1: string, user2: string, action: string): Promise<string> {
     let friendReq = await db.ref(`/FriendReqs/${user2}${user1}`).get()
     if (friendReq.val() !== null) {
-        if (accDec === "Accept") {
+        if (action === "Accept") {
             // clean up the friend requests
             db.ref(`/FriendReqs/${user2}${user1}/${user1}`).remove()
             db.ref(`/FriendReqs/${user2}${user1}/${user2}`).remove()
