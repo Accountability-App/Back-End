@@ -27,7 +27,7 @@ export async function getFriendsList(db: firebase.default.database.Database, use
  * During: authenticate user
  * Return: a list of users that have sent friend requests
  *           to a given username (first, last, username)
- * 
+ *
  */
 
 
