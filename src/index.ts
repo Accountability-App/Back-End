@@ -27,6 +27,10 @@ server.get('/BuddyTab/getFriends/:username', async (req, res) => {
 	const buddyList = await buddyService.getFriendsList(database, req.params.username);
 	res.send(buddyList)
 })
+server.get('/BuddyTab/getIncomingFriends/:username', async(req, res) => {
+	const incomingFriends = await buddyService.getIncomingFriends(database, req.params.username)
+	res.send(incomingFriends)
+})
 server.listen(PORT, () => {
     console.log(`[server]: Server is running at http://localhost:${PORT}`)
 })
