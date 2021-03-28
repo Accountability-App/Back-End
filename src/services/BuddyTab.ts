@@ -4,6 +4,26 @@ import { FriendRequest, PendingFriends, UserBuddies, UserProfileSearch } from '.
 //figure out how to store friend requests and user
 
 /*
+ *Determine if the second user exists
+ *
+ * 
+ */
+async function checkUsers(db: firebase.default.database.Database, user1: string, user2?:string):Promise<string> {
+    let checkuser = await db.ref(`/Users/${user1}`).get()
+    if (checkuser.val() === null) {
+        return `${user1} does not exist`
+    }
+    if (user2 !== null) {
+        checkuser = await db.ref(`/Users/${user2}`).get()
+        if (checkuser.val() === null) {
+            return `${user2} does not exist`
+        }
+    }
+    return "Users exist"
+}
+
+
+/*
  * Given: a user name
  * During: authenticate they're the logged in user
  * Return: a list of friends (first, last, username)
@@ -59,6 +79,15 @@ export async function getFriendStatus(db: firebase.default.database.Database, us
     let friendsList = await db.ref(`/Users/${user1}`).get()
     let areFriends
     let response: UserProfileSearch
+    if ((await checkUsers(db, user1, user2)).includes("does not exist")) {
+        response = {
+            username: "",
+            givenName: "",
+            familyName: "",
+            friendStatus: -1
+        }
+        return response
+    }
     for (const element in friendsList.val()['friends']) {
         if (element === user2) {
             let thatFriend = await db.ref(`/Users/${user2}`).get()
@@ -74,7 +103,6 @@ export async function getFriendStatus(db: firebase.default.database.Database, us
     }
     let pendingFriendsList = await db.ref('/FriendReqs').orderByChild('toUser').equalTo(user1).get()
     for (const element in pendingFriendsList.val()) {
-        //for (const element2 in pendingFriendsList.val()[element]['fromUser'])
         areFriends = (pendingFriendsList.val()[element]['fromUser'].indexOf(user2) >= 0)
         if (areFriends) {
             let thatFriend = await db.ref(`/Users/${user2}`).get()
@@ -130,18 +158,16 @@ export async function getFriendStatus(db: firebase.default.database.Database, us
   */
 export async function addFriendRequest(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
     let areFriends = false
-    let existReqs = await db.ref('/FriendReqs').orderByChild('toUser').equalTo(user1).get()
-    for (const element in existReqs.val()) {
-        console.log(element)
-        console.log(existReqs.val()[element])
-        areFriends = (existReqs.val()[element]['fromUser'].indexOf(user2) >= 0)
+    let existReqs = await db.ref(`/FriendReqs/${user2}${user1}`).get()
+    if (existReqs.val() !== null) {
+        areFriends = (existReqs.val()['fromUser'] == user2)
         if (areFriends) {
             return `Pending request from ${user2}`
         }
     }
-    existReqs = await db.ref('/FriendReqs').orderByChild('fromUser').equalTo(user1).get()
-    for (const element in existReqs.val()) {
-        areFriends = (existReqs.val()[element]['toUser'].indexOf(user2) >= 0)
+    existReqs = await db.ref(`/FriendReqs/${user1}${user2}`).get()
+    if (existReqs.val() !== null) {
+        areFriends = (existReqs.val()['toUser'] == user2)
         if (areFriends) {
             return `Pending request to ${user2}`
         }
@@ -160,18 +186,53 @@ export async function addFriendRequest(db: firebase.default.database.Database, u
    * During: authenticate first user, if a request exists from the first user to the second, cancel the request
    * Return: HTTP Status indicating success/failure
    */
-/*export async function cancelFriendRequest(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
+export async function cancelFriendRequest(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
     let friendReq = await db.ref(`/FriendReqs/${user1}${user2}`).get()
-    if (friendReq.val().length >= 1) {
-        db.ref(`/FriendReqs/${user1}${user2}`)
+    if (friendReq.val() !== null) {
+        db.ref(`/FriendReqs/${user1}${user2}/${user1}`).remove()
+        db.ref(`/FriendReqs/${user1}${user2}/${user2}`).remove()
+        db.ref(`/FriendReqs/${user1}${user2}`).remove()
+        return `Deleted request from ${user1} to ${user2}`
     }
-}*/
+    return `No request from ${user1} to ${user2}`
+}
 
-  /*
-   * Given: two users, accept/decline
-   * During: authenticate first user, accept or decline friend request to the first user from the second user
-   * Return: HTTP Status indicating success/failure
-   */
+/*
+* Given: two users, accept/decline
+* During: authenticate first user, accept or decline friend request to the first user from the second user
+* Return: HTTP Status indicating success/failure
+*/
+export async function respondToFriendRequest(db: firebase.default.database.Database, user1: string, user2: string, accDec: string): Promise<string> {
+    let friendReq = await db.ref(`/FriendReqs/${user2}${user1}`).get()
+    if (friendReq.val() !== null) {
+        if (accDec === "Accept") {
+            // clean up the friend requests
+            db.ref(`/FriendReqs/${user2}${user1}/${user1}`).remove()
+            db.ref(`/FriendReqs/${user2}${user1}/${user2}`).remove()
+            db.ref(`/FriendReqs/${user2}${user1}`).remove()
+
+            let userRef = await db.ref(`/Users/${user1}/Friends`).get()
+            let temp = userRef.val()
+            temp.push({user2: user2})
+            (await db.ref(`/Users/${user1}/Friends`).push()).set(temp)
+
+            userRef = await db.ref(`/Users/${user2}/Friends`).get()
+            temp = userRef.val()
+            temp.push({user1: user1})
+            await (await db.ref(`/Users/${user2}/Friends`).push()).set(temp)
+
+            return `Accepted friend request from ${user2}`
+        } else {
+            // clean up the friend requests
+            db.ref(`/FriendReqs/${user2}${user1}/${user1}`).remove()
+            db.ref(`/FriendReqs/${user2}${user1}/${user2}`).remove()
+            db.ref(`/FriendReqs/${user2}${user1}`).remove()
+
+            return `Declined friend request from ${user2}`
+        }
+    } 
+    return `No friend request from ${user2}`
+}
 
 /*
  * Given: two users
