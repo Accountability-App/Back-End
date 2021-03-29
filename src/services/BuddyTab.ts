@@ -51,7 +51,7 @@ export async function getFriendsList(db: firebase.default.database.Database, use
  * During: authenticate user
  * Return: a list of users that have sent friend requests
  *           to a given username (first, last, username)
- * 
+ *
  */
 export async function getIncomingFriends(db: firebase.default.database.Database, username: string): Promise<PendingFriends[]> {
     let pendingFriendsList = await db.ref('/FriendReqs').orderByChild('toUser').equalTo(username).get()
@@ -239,3 +239,4 @@ export async function respondToFriendRequest(db: firebase.default.database.Datab
  * During: unfriends the users
  * Return: Http Status indicating success/failure
  */
+

@@ -1,6 +1,8 @@
 import express from 'express';
 import firebase from 'firebase';
 import * as buddyService from './services/BuddyTab';
+import * as profileService from './services/ProfileTab';
+import * as taskService from './services/TaskTab';
 firebase.initializeApp({
 	apiKey: "",
 	authDomain: "accountability-app-29b4b.firebaseapp.com",
@@ -18,10 +20,19 @@ var database = firebase.database();
 const server = express();
 const PORT = 8082;
 server.use(function(req, res, next) {
-    res.header("Access-Control-Allow-Origin", "*");
-    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
-    next();
+	res.header("Access-Control-Allow-Origin", "*");
+	res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+	next();
 });
+server.get('/', (req, res) => res.send('Express and Typescript Server'));
+server.get('/ProfileTab/:username', async (req, res) => {
+	const userProfile = await profileService.getUserProf(database, req.params.username);
+	res.send(userProfile);
+})
+server.get('/TaskTab/createTask/:user/:task/:info/:completeTime/:rep', async (req, res) => {
+  const newTask = await taskService.createTask(database, req.params.user, req.params.task, req.params.info, req.params.completeTime, req.params.rep);
+	res.send(newTask);
+})
 server.get('/', (req, res) => res.send('Express and Typescript Server'));
 server.get('/BuddyTab/getFriends/:username', async (req, res) => {
 	const buddyList = await buddyService.getFriendsList(database, req.params.username);
@@ -47,6 +58,7 @@ server.get('/BuddyTab/respondToFriendRequest/:user1/:user2/:action', async(req, 
 	const respondRequest = await buddyService.respondToFriendRequest(database, req.params.user1, req.params.user2, req.params.action)
 	res.send(respondRequest)
 })
+
 server.listen(PORT, () => {
     console.log(`[server]: Server is running at http://localhost:${PORT}`)
 })
