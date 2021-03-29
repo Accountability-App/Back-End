@@ -4,11 +4,11 @@ import * as buddyService from './services/BuddyTab';
 import * as profileService from './services/ProfileTab';
 import * as taskService from './services/TaskTab';
 firebase.initializeApp({
-	apiKey: "AIzaSyC-LNcsyrnk4JavlEXUVhfJCOQTs6yXcJY",
+	apiKey: "",
 	authDomain: "accountability-app-29b4b.firebaseapp.com",
 	databaseURL: "https://accountability-app-29b4b-default-rtdb.firebaseio.com",
 	projectId: "accountability-app-29b4b",
-	appId: "1:514146284743:web:c6b30b0e7ea61958433ae2",
+	appId: "",
 });
 var database = firebase.database();
 /*database.ref('Users/').get().then(function(name){
