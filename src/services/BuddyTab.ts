@@ -56,6 +56,7 @@ export async function getFriendsList(db: firebase.default.database.Database, use
 export async function getIncomingFriends(db: firebase.default.database.Database, username: string): Promise<PendingFriends[]> {
     let pendingFriendsList = await db.ref('/FriendReqs').orderByChild('toUser').equalTo(username).get()
     let pendingData: Array<PendingFriends> = new Array<PendingFriends>();
+    console.log(pendingFriendsList.val(), username)
     for (const element in pendingFriendsList.val()) {
         let pendingRequest = pendingFriendsList.val()[element]['fromUser']
         let pendingFriend = await db.ref(`/Users/${pendingRequest}`).get();
@@ -157,27 +158,37 @@ export async function getFriendStatus(db: firebase.default.database.Database, us
   * Return: HTTP Status indicating success/failure
   */
 export async function addFriendRequest(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
+    try {
     let areFriends = false
-    let existReqs = await db.ref(`/FriendReqs/${user2}${user1}`).get()
+    let existReqs = await db.ref(`/FriendReqs`).orderByChild('fromUser').equalTo(user2).get()
     if (existReqs.val() !== null) {
-        areFriends = (existReqs.val()['fromUser'] == user2)
-        if (areFriends) {
-            return `Pending request from ${user2}`
+        for (const element in existReqs) {
+            console.log(existReqs.val())
+            areFriends = (existReqs.val()[element]['toUser'] == user1)
+            if (areFriends) {
+                return `Pending request from ${user2}`
+            }
         }
     }
-    existReqs = await db.ref(`/FriendReqs/${user1}${user2}`).get()
+    existReqs = await db.ref(`/FriendReqs`).orderByChild('toUser').equalTo(user2).get()
     if (existReqs.val() !== null) {
-        areFriends = (existReqs.val()['toUser'] == user2)
-        if (areFriends) {
-            return `Pending request to ${user2}`
+        for (const element in existReqs) {
+            areFriends = (existReqs.val()[element]['fromUser'] == user1)
+            if (areFriends) {
+                return `Pending request to ${user2}`
+            }
         }
     }
     let newFriendReq: FriendRequest = {
         fromUser: user1,
         toUser: user2
     }
-    await (await db.ref(`/FriendReqs/${user1}${user2}`).push()).set(newFriendReq)
+    await (await db.ref(`/FriendReqs`).push()).set(newFriendReq)
     return `Added friend request to ${user2}`
+    } catch(e) {
+        console.log(e)
+        return "FAILED"
+    }
 }
 
 
