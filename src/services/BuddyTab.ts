@@ -158,6 +158,7 @@ export async function getFriendStatus(db: firebase.default.database.Database, us
   * Return: HTTP Status indicating success/failure
   */
 export async function addFriendRequest(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
+    // validate the two users exist
     try {
     let areFriends = false
     let existReqs = await db.ref(`/FriendReqs`).orderByChild('fromUser').equalTo(user2).get()
