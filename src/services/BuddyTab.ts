@@ -162,7 +162,7 @@ export async function addFriendRequest(db: firebase.default.database.Database, u
     let areFriends = false
     let existReqs = await db.ref(`/FriendReqs`).orderByChild('fromUser').equalTo(user2).get()
     if (existReqs.val() !== null) {
-        for (const element in existReqs) {
+        for (const element in existReqs.val()) {
             console.log(existReqs.val())
             areFriends = (existReqs.val()[element]['toUser'] == user1)
             if (areFriends) {
@@ -172,7 +172,10 @@ export async function addFriendRequest(db: firebase.default.database.Database, u
     }
     existReqs = await db.ref(`/FriendReqs`).orderByChild('toUser').equalTo(user2).get()
     if (existReqs.val() !== null) {
-        for (const element in existReqs) {
+        console.log(existReqs.val())
+        for (const element in existReqs.val()) {
+            console.log(element)
+            console.log(existReqs.val()[element])
             areFriends = (existReqs.val()[element]['fromUser'] == user1)
             if (areFriends) {
                 return `Pending request to ${user2}`
