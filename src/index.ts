@@ -29,11 +29,14 @@ server.get('/ProfileTab/:username', async (req, res) => {
 	const userProfile = await profileService.getUserProf(database, req.params.username);
 	res.send(userProfile);
 })
+server.get('/ProfileTab/updateDesc/:username/:saveDescription', async (req, res) => {
+	const updateStatus = await profileService.updateDescription(database, req.params.username, req.params.saveDescription);
+	res.send(updateStatus);
+})
 server.get('/TaskTab/createTask/:user/:task/:info/:completeTime/:rep', async (req, res) => {
   const newTask = await taskService.createTask(database, req.params.user, req.params.task, req.params.info, req.params.completeTime, req.params.rep);
 	res.send(newTask);
 })
-server.get('/', (req, res) => res.send('Express and Typescript Server'));
 server.get('/BuddyTab/getFriends/:username', async (req, res) => {
 	const buddyList = await buddyService.getFriendsList(database, req.params.username);
 	res.send(buddyList)
