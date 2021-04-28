@@ -6,11 +6,9 @@ Parameter(s): username, a tasks: {taskName, details, date/time of task, repeat f
 Returns: the created task object
 */
 export async function createTask(db: firebase.default.database.Database, user: string, taskName: string, taskInfo: string,
-completeBy: string, completeDay: string, buddies: Array<string> repeatFlag: string, repWeekDay: Array<boolean>) : Promise<Task> {
+completeBy: string, completeDay: string, buddies: Array<string>, repeatFlag: boolean, repWeekDay: Array<boolean>) : Promise<Task> {
   //Need to create unique task IDs here
-  let repeatOn: boolean = false;
-  if(repeatFlag == "1")
-    repeatOn = true;
+	
 	//let taskBuddies = await getBuddyUsernames(db, user)
   let taskID = uuidv4();
   let taskToAdd: Task = {
@@ -20,7 +18,7 @@ completeBy: string, completeDay: string, buddies: Array<string> repeatFlag: stri
     completeTime: completeBy,
 		completeDay: completeDay,
 		buddies: buddies,
-    repeat: repeatOn,
+    repeat: repeatFlag,
 		repWeekDay: repWeekDay
   };
 

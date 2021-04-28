@@ -33,8 +33,10 @@ server.get('/ProfileTab/updateDesc/:username/:saveDescription', async (req, res)
 	const updateStatus = await profileService.updateDescription(database, req.params.username, req.params.saveDescription);
 	res.send(updateStatus);
 })
-server.get('/TaskTab/createTask/:user/:task/:info/:completeTime/:completeDay/:rep', async (req, res) => {
-  const newTask = await taskService.createTask(database, req.params.user, req.params.task, req.params.info, req.params.completeTime, req.params.completeDay, req.params.rep);
+server.post('/TaskTab/createTask', function (req, res) {
+	var task = req.body.task;
+	const newTask = await taskService.createTask(database, task.createdBy, task.taskName, task.details, task.completeTime, task.completeDay, task.buddies, task.repeat, task.repWeekDay);
+	
 	res.send(newTask);
 })
 server.get('/TaskTab/getBuddyUsername/:user', async (req, res) => {
