@@ -5,6 +5,6 @@ export interface Task {
   completeTime: string,  //Need to specify how to store dates
   completeDay: string, 
   buddies: Array<string>,
-  repeat: boolean
+  repeat: boolean,
 	repWeekDay: Array<boolean>
 }
