@@ -59,12 +59,13 @@ export async function getMyTasks(db: firebase.default.database.Database, user: s
 	}
 	let allTasks : Array<Task> = new Array<Task>();
 	
-	for(const taskLabel in taskId) {
+	for(const taskLabel of taskId) {
+		console.log(taskLabel);
 		let taskData = await db.ref(`/Tasks/${taskLabel}`).get();
-		allTasks.push(taskData);
+		allTasks.push(taskData.val());
 		console.log(allTasks);
 	}
-	colsole.log(allTasks);
+	console.log(allTasks);
 	return allTasks;
 }
 

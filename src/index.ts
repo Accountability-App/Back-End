@@ -33,7 +33,7 @@ server.get('/ProfileTab/updateDesc/:username/:saveDescription', async (req, res)
 	const updateStatus = await profileService.updateDescription(database, req.params.username, req.params.saveDescription);
 	res.send(updateStatus);
 })
-server.post('/TaskTab/createTask', function (req, res) {
+server.post('/TaskTab/createTask', async (req, res) => {
 	var task = req.body.task;
 	const newTask = await taskService.createTask(database, task.createdBy, task.taskName, task.details, task.completeTime, task.completeDay, task.buddies, task.repeat, task.repWeekDay);
 	
