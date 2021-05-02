@@ -205,9 +205,9 @@ export async function addFriendRequest(db: firebase.default.database.Database, u
 export async function cancelFriendRequest(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
     let friendReq = await db.ref(`/FriendReqs/${user1}${user2}`).get()
     if (friendReq.val() !== null) {
-        db.ref(`/FriendReqs/${user2}${user1}/toUser`).remove()
-        db.ref(`/FriendReqs/${user2}${user1}/fromUser`).remove()
-        db.ref(`/FriendReqs/${user2}${user1}`).remove()
+        db.ref(`/FriendReqs/${user1}${user2}/toUser`).remove()
+        db.ref(`/FriendReqs/${user1}${user2}/fromUser`).remove()
+        db.ref(`/FriendReqs/${user1}${user2}`).remove()
         return `Deleted request from ${user1} to ${user2}`
     }
     return `No request from ${user1} to ${user2}`
@@ -266,6 +266,27 @@ export async function respondToFriendRequest(db: firebase.default.database.Datab
  * Return: Http Status indicating success/failure
  */
 
-/*export async function removeFriend(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
-    
-}*/
+export async function removeFriend(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
+    let areFriends = await db.ref(`/Users/${user1}/friends`).get()
+
+    let userRef = await db.ref(`/Users/${user1}/friends`).get()
+    let temp = userRef.val()
+    if (temp === null) {
+        temp = {}
+    }
+    console.log(temp)
+    temp[user2] = user2;
+    await db.ref(`/Users/${user1}/friends`).update(temp)
+
+    userRef = await db.ref(`/Users/${user2}/friends`).get()
+    temp = userRef.val()
+    console.log(temp)
+    if (temp === null) {
+        temp = {}
+    }
+    // fix adding this element here
+    temp[user1] = user1;
+    await db.ref(`/Users/${user2}/friends`).update(temp)
+
+    return 'this is broken'
+}
