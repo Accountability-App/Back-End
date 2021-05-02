@@ -267,26 +267,8 @@ export async function respondToFriendRequest(db: firebase.default.database.Datab
  */
 
 export async function removeFriend(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
-    let areFriends = await db.ref(`/Users/${user1}/friends`).get()
-
-    let userRef = await db.ref(`/Users/${user1}/friends`).get()
-    let temp = userRef.val()
-    if (temp === null) {
-        temp = {}
-    }
-    console.log(temp)
-    temp[user2] = user2;
-    await db.ref(`/Users/${user1}/friends`).update(temp)
-
-    userRef = await db.ref(`/Users/${user2}/friends`).get()
-    temp = userRef.val()
-    console.log(temp)
-    if (temp === null) {
-        temp = {}
-    }
+    await db.ref(`/Users/${user1}/friends/${user2}`).remove()
+    await db.ref(`/Users/${user2}/friends/${user1}`).remove()
     // fix adding this element here
-    temp[user1] = user1;
-    await db.ref(`/Users/${user2}/friends`).update(temp)
-
-    return 'this is broken'
+    return `Removed friends state between ${user1} and ${user2}`
 }
