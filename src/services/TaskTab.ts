@@ -23,6 +23,7 @@ completeBy: string, completeDay: string, buddies: Array<string>, repeatFlag: boo
   };
 
   await db.ref("/Tasks").child(taskID).set(taskToAdd);
+	//await db.ref("/Users/${user}/tasks").set(taskID);  // Should add the task ID in the users JSON, thus allowing easier searching
   console.log(taskToAdd);
   return taskToAdd;
 }
@@ -42,4 +43,35 @@ export async function getBuddyUsernames(db: firebase.default.database.Database, 
 	}
 	console.log(friendUsernames);
 	return friendUsernames;
+}
+
+/*
+ * Given: current user
+ * Return: list of the tasks that user created
+*/
+export async function getMyTasks(db: firebase.default.database.Database, user: string) {
+	let userData = await db.ref(`/Users/${user}`).get();
+	let taskId : Array<string> = new Array<string>();
+	for(const element in userData.val()['tasks']) {
+		let taskName = userData.val()['tasks'][element];
+		taskId.push(taskName);
+		console.log(taskId);
+	}
+	let allTasks : Array<Task> = new Array<Task>();
+	
+	for(const taskLabel in taskId) {
+		let taskData = await db.ref(`/Tasks/${taskLabel}`).get();
+		allTasks.push(taskData);
+		console.log(allTasks);
+	}
+	colsole.log(allTasks);
+	return allTasks;
+}
+
+/*
+ * Given: current user
+ * Return: list of the tasks that user is a buddy of
+*/
+export async function getHelpingTasks(db: firebase.default.database.Database, user: string) {
+	
 }

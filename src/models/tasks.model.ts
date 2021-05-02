@@ -8,3 +8,18 @@ export interface Task {
   repeat: boolean,
 	repWeekDay: Array<boolean>
 }
+
+/*  model for the stringify for posting tasks
+{
+	"task": {
+		createdBy: string,
+		taskName: string,
+		details: string,
+		completeTime: string,  
+		completeDay: string, 
+		buddies: Array<string>,
+		repeat: boolean,
+		repWeekDay: Array<boolean>
+	}
+}
+*/
