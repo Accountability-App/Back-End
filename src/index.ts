@@ -40,7 +40,7 @@ server.post('/TaskTab/createTask', function (req, res) {
 	res.send(newTask);
 })
 server.get('/TaskTab/getBuddyUsername/:user', async (req, res) => {
-  const getBuddies = await taskService.getBuddyUsername(database, req.params.user);
+  const getBuddies = await taskService.getBuddyUsernames(database, req.params.user);
 	res.send(getBuddies);
 })
 server.get('/TaskTab/getMyTasks/:user', async (req, res) => {
