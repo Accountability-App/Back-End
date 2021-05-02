@@ -58,6 +58,10 @@ server.get('/BuddyTab/respondToFriendRequest/:user1/:user2/:action', async(req, 
 	const respondRequest = await buddyService.respondToFriendRequest(database, req.params.user1, req.params.user2, req.params.action)
 	res.send(respondRequest)
 })
+server.get('/BuddyTab/removeFriend/:user1/:user2', async(req, res) => {
+	const removeFriend = await buddyService.removeFriend(database, req.params.user1, req.params.user2)
+	res.send(removeFriend)
+})
 
 server.listen(PORT, () => {
     console.log(`[server]: Server is running at http://localhost:${PORT}`)
