@@ -59,6 +59,7 @@ export async function getIncomingFriends(db: firebase.default.database.Database,
     console.log(pendingFriendsList.val(), username)
     for (const element in pendingFriendsList.val()) {
         let pendingRequest = pendingFriendsList.val()[element]['fromUser']
+        console.log(pendingRequest);
         let pendingFriend = await db.ref(`/Users/${pendingRequest}`).get();
         let newPendingFriend: PendingFriends = {
             username: pendingRequest,
@@ -187,7 +188,7 @@ export async function addFriendRequest(db: firebase.default.database.Database, u
         fromUser: user1,
         toUser: user2
     }
-    await (await db.ref(`/FriendReqs`).push()).set(newFriendReq)
+    await db.ref(`/FriendReqs/${user1}${user2}`).update(newFriendReq)
     return `Added friend request to ${user2}`
     } catch(e) {
         console.log(e)
@@ -202,7 +203,7 @@ export async function addFriendRequest(db: firebase.default.database.Database, u
    * Return: HTTP Status indicating success/failure
    */
 export async function cancelFriendRequest(db: firebase.default.database.Database, user1: string, user2: string): Promise<string> {
-    let friendReq = await db.ref(`/FriendReqs`).orderByChild('toUser').equalTo(user2).get()
+    let friendReq = await db.ref(`/FriendReqs/${user1}${user2}`).get()
     if (friendReq.val() !== null) {
         for (const element in friendReq.val()) {
             if (friendReq.val()[element]['fromUser'] === user1) {
@@ -222,25 +223,27 @@ export async function cancelFriendRequest(db: firebase.default.database.Database
 * Return: HTTP Status indicating success/failure
 */
 export async function respondToFriendRequest(db: firebase.default.database.Database, user1: string, user2: string, action: string): Promise<string> {
-    let friendReq = await db.ref(`/FriendReqs`).orderByChild('toUser').equalTo(user1).get()
+    let friendReq = await db.ref(`/FriendReqs/${user2}${user1}`).get()
     if (friendReq.val() !== null) {
         for (const element in friendReq.val()) {
             if (friendReq.val()[element]['fromUser'] === user2) {
                 if (action === "Accept") {
                     // clean up the friend requests
-                    db.ref(`/FriendReqs/${element}/toUser`).remove()
-                    db.ref(`/FriendReqs/${element}/fromUser`).remove()
-                    db.ref(`/FriendReqs/${element}`).remove()
+                    //db.ref(`/FriendReqs/${element}/toUser`).remove()
+                    //db.ref(`/FriendReqs/${element}/fromUser`).remove()
+                    //db.ref(`/FriendReqs/${element}`).remove()
         
-                    let userRef = await db.ref(`/Users/${user1}/Friends`).get()
+                    let userRef = await db.ref(`/Users/${user1}/friends`).get()
                     let temp = userRef.val()
-                    temp.push({user2: user2})
-                    (await db.ref(`/Users/${user1}/Friends`).push()).set(temp)
+                    console.log(temp)
+                    temp[user2] = user2;
+                    await db.ref(`/Users/${user1}/friends`).update(temp)
         
-                    userRef = await db.ref(`/Users/${user2}/Friends`).get()
+                    userRef = await db.ref(`/Users/${user2}/friends`).get()
                     temp = userRef.val()
-                    temp.push({user1: user1})
-                    await (await db.ref(`/Users/${user2}/Friends`).push()).set(temp)
+                    // fix adding this element here
+                    temp[user1] = user1;
+                    await db.ref(`/Users/${user2}/friends`).update(temp)
         
                     return `Accepted friend request from ${user2}`
                 } else {
