@@ -74,5 +74,16 @@ export async function getMyTasks(db: firebase.default.database.Database, user: s
  * Return: list of the tasks that user is a buddy of
 */
 export async function getHelpingTasks(db: firebase.default.database.Database, user: string) {
-	
+	let allTasks = await db.ref(`/Tasks`).get();
+	let helperTasks : Array<Task> = new Array<Task>();
+	for(const element in allTasks.val()) {
+		let currTask = await db.ref(`/Tasks/${element}`).get();
+		for(const el of currTask.val()['buddies']) {
+			if(el == user) {
+				helperTasks.push(currTask.val())
+			}
+		}
+	}
+	console.log(helperTasks);
+	return helperTasks;
 }

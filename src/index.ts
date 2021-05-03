@@ -47,6 +47,10 @@ server.get('/TaskTab/getMyTasks/:user', async (req, res) => {
 	const getTasks = await taskService.getMyTasks(database, req.params.user);
 	res.send(getTasks);
 })
+server.get('/TaskTab/getHelpingTasks/:user', async (req, res) => {
+	const getHelpTasks = await taskService.getHelpingTasks(database, req.params.user);
+	res.send(getHelpTasks);
+})
 server.get('/BuddyTab/getFriends/:username', async (req, res) => {
 	const buddyList = await buddyService.getFriendsList(database, req.params.username);
 	res.send(buddyList)
