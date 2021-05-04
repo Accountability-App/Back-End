@@ -49,10 +49,6 @@ export async function getBuddyUsernames(db: firebase.default.database.Database, 
 		console.log(friendUsernames);
 	}
 	
-	let userTasks: UserTasks = {
-		taskID: "working"
-	}
-	
 	console.log(friendUsernames);
 	return friendUsernames;
 }
