@@ -28,7 +28,7 @@ completeBy: string, completeDay: string, buddies: Array<string>, repeatFlag: boo
 		temp = {}
 	}
 	temp[taskID] = taskID;
-	await db.ref("/Users/${user}/tasks").update(temp);  // Should add the task ID in the users JSON, thus allowing easier searching
+	await db.ref(`/Users/${user}/tasks`).update(temp);  // Should add the task ID in the users JSON, thus allowing easier searching
   
 	await db.ref("/Tasks").child(taskID).set(taskToAdd);
   console.log(taskToAdd);

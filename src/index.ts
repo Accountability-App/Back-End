@@ -1,5 +1,6 @@
 import express from 'express';
 import firebase from 'firebase';
+import { type } from 'node:os';
 import * as buddyService from './services/BuddyTab';
 import * as profileService from './services/ProfileTab';
 import * as taskService from './services/TaskTab';
@@ -18,6 +19,7 @@ var database = firebase.database();
 	}
 });*/
 const server = express();
+server.use(express.json());
 const PORT = 8082;
 server.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
@@ -34,7 +36,7 @@ server.get('/ProfileTab/updateDesc/:username/:saveDescription', async (req, res)
 	res.send(updateStatus);
 })
 server.post('/TaskTab/createTask', async (req, res) => {
-	var task = req.body.task;
+	let task = req.body;
 	const newTask = await taskService.createTask(database, task.createdBy, task.taskName, task.details, task.completeTime, task.completeDay, task.buddies, task.repeat, task.repWeekDay);
 	
 	res.send(newTask);
