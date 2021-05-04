@@ -21,9 +21,16 @@ completeBy: string, completeDay: string, buddies: Array<string>, repeatFlag: boo
     repeat: repeatFlag,
 		repWeekDay: repWeekDay
   };
-
-  await db.ref("/Tasks").child(taskID).set(taskToAdd);
-	//await db.ref("/Users/${user}/tasks").set(taskID);  // Should add the task ID in the users JSON, thus allowing easier searching
+	
+	let userRef = await db.ref(`/Users/${user}/tasks`).get();
+	let temp = userRef.val();
+	if(temp == null) {
+		temp = {}
+	}
+	temp[taskID] = taskID;
+	await db.ref("/Users/${user}/tasks").update(temp);  // Should add the task ID in the users JSON, thus allowing easier searching
+  
+	await db.ref("/Tasks").child(taskID).set(taskToAdd);
   console.log(taskToAdd);
   return taskToAdd;
 }
@@ -41,6 +48,11 @@ export async function getBuddyUsernames(db: firebase.default.database.Database, 
 		friendUsernames.push(friendUser);
 		console.log(friendUsernames);
 	}
+	
+	let userTasks: UserTasks = {
+		taskID: "working"
+	}
+	
 	console.log(friendUsernames);
 	return friendUsernames;
 }
