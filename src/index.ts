@@ -1,5 +1,6 @@
 import express from 'express';
 import firebase from 'firebase';
+import { type } from 'node:os';
 import * as buddyService from './services/BuddyTab';
 import * as profileService from './services/ProfileTab';
 import * as taskService from './services/TaskTab';
@@ -18,6 +19,7 @@ var database = firebase.database();
 	}
 });*/
 const server = express();
+server.use(express.json());
 const PORT = 8082;
 server.use(function(req, res, next) {
 	res.header("Access-Control-Allow-Origin", "*");
@@ -29,11 +31,28 @@ server.get('/ProfileTab/:username', async (req, res) => {
 	const userProfile = await profileService.getUserProf(database, req.params.username);
 	res.send(userProfile);
 })
-server.get('/TaskTab/createTask/:user/:task/:info/:completeTime/:rep', async (req, res) => {
-  const newTask = await taskService.createTask(database, req.params.user, req.params.task, req.params.info, req.params.completeTime, req.params.rep);
+server.get('/ProfileTab/updateDesc/:username/:saveDescription', async (req, res) => {
+	const updateStatus = await profileService.updateDescription(database, req.params.username, req.params.saveDescription);
+	res.send(updateStatus);
+})
+server.post('/TaskTab/createTask', async (req, res) => {
+	let task = req.body;
+	const newTask = await taskService.createTask(database, task.createdBy, task.taskName, task.details, task.completeTime, task.completeDay, task.buddies, task.repeat, task.repWeekDay);
+	
 	res.send(newTask);
 })
-server.get('/', (req, res) => res.send('Express and Typescript Server'));
+server.get('/TaskTab/getBuddyUsername/:user', async (req, res) => {
+  const getBuddies = await taskService.getBuddyUsernames(database, req.params.user);
+	res.send(getBuddies);
+})
+server.get('/TaskTab/getMyTasks/:user', async (req, res) => {
+	const getTasks = await taskService.getMyTasks(database, req.params.user);
+	res.send(getTasks);
+})
+server.get('/TaskTab/getHelpingTasks/:user', async (req, res) => {
+	const getHelpTasks = await taskService.getHelpingTasks(database, req.params.user);
+	res.send(getHelpTasks);
+})
 server.get('/BuddyTab/getFriends/:username', async (req, res) => {
 	const buddyList = await buddyService.getFriendsList(database, req.params.username);
 	res.send(buddyList)
